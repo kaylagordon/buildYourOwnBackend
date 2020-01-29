@@ -1,36 +1,37 @@
-// const papersData = require('../../../papersData');
-import { data } from '../../../data';
+const simplifiedData = require('../../../data');
 
-const createPaper = async (knex, paper) => {
-  const paperId = await knex('papers').insert({
-    title: paper.title,
-    author: paper.author
+const createCategory = async (knex, category) => {
+  const categoryId = await knex('categories').insert({
+    category: category.category,
+    category_link: category.category_link
   }, 'id');
 
-  let footnotePromises = paper.footnotes.map(footnote => {
-    return createFootnote(knex, {
-      note: footnote,
-      paper_id: paperId[0]
+  let campaignPromises = category.campaigns.map(campaign => {
+    return createCampaign(knex, {
+      name: campaign.name,
+      creator: campaign.creator,
+      location: campaign.location,
+      category_id: categoryId[0]
     })
   });
 
-  return Promise.all(footnotePromises);
+  return Promise.all(campaignPromises);
 };
 
-const createFootnote = (knex, footnote) => {
-  return knex('footnotes').insert(footnote);
+const createCampaign = (knex, campaign) => {
+  return knex('campaigns').insert(campaign);
 };
 
 exports.seed = async (knex) => {
   try {
-    await knex('footnotes').del() // delete footnotes first
-    await knex('papers').del() // delete all papers
+    await knex('campaigns').del();
+    await knex('categories').del();
 
-    let paperPromises = papersData.map(paper => {
-      return createPaper(knex, paper);
+    let categoryPromises = simplifiedData.map(category => {
+      return createCategory(knex, category);
     });
 
-    return Promise.all(paperPromises);
+    return Promise.all(categoryPromises);
   } catch (error) {
     console.log(`Error seeding data: ${error}`)
   }
