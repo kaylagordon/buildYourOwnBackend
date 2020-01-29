@@ -1,0 +1,29 @@
+{
+  "name": "byob",
+  "version": "1.0.0",
+  "description": "",
+  "main": "data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaylaewood/buildYourOwnBackend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kaylaewood/buildYourOwnBackend/issues"
+  },
+  "homepage": "https://github.com/kaylaewood/buildYourOwnBackend#readme",
+  "dependencies": {
+    "knex": "^0.20.8",
+    "pg": "^7.18.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/node": "^7.8.3",
+    "@babel/preset-env": "^7.8.3"
+  }
+}
