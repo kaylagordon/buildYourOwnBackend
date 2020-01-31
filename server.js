@@ -40,6 +40,17 @@ app.get('/api/v1/categories/:id', async (request, response) => {
   response.status(200).json(category);
 });
 
+app.get('/api/v1/campaigns/:id', async (request, response) => {
+  const { id } = request.params;
+  const campaigns = await database('campaigns').select();
+  const campaign = campaigns.find(campaign => campaign.id == id);
+  if (!campaign) {
+    return response.sendStatus(404);
+  }
+
+  response.status(200).json(campaign);
+});
+
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on http://localhost:${app.get('port')}.`);
 });
