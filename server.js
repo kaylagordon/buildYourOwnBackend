@@ -64,10 +64,34 @@ app.post('/api/v1/categories', (request, response) => {
     }
   }
 
-  const { category, category_link } = newCategory;
-
   database('categories').insert(newCategory, 'id')
     .then(response.status(201).json(newCategory))
+    .catch(error = console.log(error))
+});
+
+app.post('/api/v1/campaigns', async (request, response) => {
+  const newCampaign = request.body;
+
+  for (let requiredParameter of ['name', 'creator','category_name', 'location']) {
+    if (!newCampaign[requiredParameter]) {
+      return response
+        .status(422)
+        .send({ error: `Expected format: { name: <String>, creator: <String>, category_name: <String>, location: <String> }. You are missing the ${requiredParameter} property.` });
+    }
+  }
+
+  const { name, creator, category_name, location } = newCampaign;
+  const categories = await database('categories').select();
+
+  const categoryId = categories.find(category => category.category === category_name).id;
+
+  database('campaigns').insert({
+    name,
+    creator,
+    location,
+    category_id: categoryId
+  }, 'id')
+    .then(response.status(201).json(newCampaign))
     .catch(error = console.log(error))
 });
 
