@@ -8,7 +8,7 @@ app.set('port', process.env.PORT || 3000);
 app.locals.title = 'Kickstarter Campaigns';
 
 app.get('/', (request, response) => {
-  response.send('Oh hi, this is home!');
+  response.send('Welcome to the Kickstarter database!');
 });
 
 app.get('/api/v1/categories', async (request, response) => {
@@ -27,6 +27,17 @@ app.get('/api/v1/campaigns', async (request, response) => {
   } catch(error) {
     response.status(500).json({ error });
   }
+});
+
+app.get('/api/v1/categories/:id', async (request, response) => {
+  const { id } = request.params;
+  const categories = await database('categories').select();
+  const category = categories.find(category => category.id == id);
+  if (!category) {
+    return response.sendStatus(404);
+  }
+
+  response.status(200).json(category);
 });
 
 app.listen(app.get('port'), () => {
