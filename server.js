@@ -4,6 +4,8 @@ const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
 
+app.use(express.json());
+
 app.set('port', process.env.PORT || 3000);
 app.locals.title = 'Kickstarter Campaigns';
 
@@ -51,7 +53,23 @@ app.get('/api/v1/campaigns/:id', async (request, response) => {
   response.status(200).json(campaign);
 });
 
+app.post('/api/v1/categories', (request, response) => {
+  const newCategory = request.body;
 
+  for (let requiredParameter of ['category', 'category_link']) {
+    if (!newCategory[requiredParameter]) {
+      return response
+        .status(422)
+        .send({ error: `Expected format: { category: <String>, category_link: <String> }. You are missing the ${requiredParameter} property.` });
+    }
+  }
+
+  const { category, category_link } = newCategory;
+
+  database('categories').insert(newCategory, 'id')
+    .then(response.status(201).json(newCategory))
+    .catch(error = console.log(error))
+});
 
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on http://localhost:${app.get('port')}.`);
