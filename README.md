@@ -1,8 +1,8 @@
 # Build Your Own Backend
 ### Background
-This is the first server and database I've built! I used **Express** as a framework on top of **Node.js** to handle the routes. I used **Knex** to make SQL queries. I built the database using **PostgreSQL**. The database contains data on Kickstarter campaigns.
+I deployed a **RESTful API** that contains data on Kickstarter campaigns from a database I built using **PostgreSQL**. The server, built with **Express** over **Node.js**, acts as the route handler, allowing the user to `GET`, `POST`, and `DELETE` from various endpoints (more details below).
 
-If you would like to see a line-by-line explanation of the methods in the `server.js` file, open that file in the `articulation` branch of this project (or [click here](https://github.com/kaylaewood/buildYourOwnBackend/blob/articulation/server.js)).
+If you would like to see a line-by-line explanation of the server's methods, open the `server.js` file in the `articulation` branch of this project (or [click here](https://github.com/kaylaewood/buildYourOwnBackend/blob/articulation/server.js)).
 
 I organized this project by creating user stories on my [GitHub projects board](https://github.com/kaylaewood/buildYourOwnBackend/projects/1).
 
