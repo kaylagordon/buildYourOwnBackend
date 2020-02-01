@@ -2,7 +2,7 @@
 ### Background
 This is the first server I've built! I used **Express** as a framework on top of **Node.js** to handle the routes. I used **Knex** to make SQL queries. I built the database using **PostgreSQL**.
 
-If you would like to see a line-by-line explanation of the methods in the `server.js` file, open that file in the `articulation` branch of this project.
+If you would like to see a line-by-line explanation of the methods in the `server.js` file, open that file in the `articulation` branch of this project (or [click here](https://github.com/kaylaewood/buildYourOwnBackend/blob/articulation/server.js)).
 
 ### API Documentation
 All API endpoints are prefixed with either `http://localhost:3000` or `https://buildyourownbackend.herokuapp.com/`.
