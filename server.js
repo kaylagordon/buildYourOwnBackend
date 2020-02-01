@@ -1,26 +1,27 @@
-const express = require('express');
-const app = express();
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('./knexfile')[environment];
-const database = require('knex')(configuration);
+const express = require('express'); //import Express framework
+const app = express(); //let app represent the invokation of express
+const environment = process.env.NODE_ENV || 'development'; //when this application is running in Heroku, it will recognize that it is in the production environment. Otherwise, it will default to development environment.
+const configuration = require('./knexfile')[environment]; //import the environment settings from the knexfile
+const database = require('knex')(configuration); //using the environment settings, connect to the database via knex
 
 const throwError = (response, statusCode, message) => {
-  return response.status(statusCode).send({ error: message });
+  return response.status(statusCode).send({ error: message }); //return a response object with an error status code and an error message
 }
 
 const checkSection = (response, section) => {
-  if (section !== 'categories' && section !== 'campaigns') {
-    throwError(response, 422, `The section ${section} does not exist. The only sections are categories and campaigns.`);
+  if (section !== 'categories' && section !== 'campaigns') { //if the section is something other than categories or campaigns...
+    throwError(response, 422, `The section ${section} does not exist. The only sections are categories and campaigns.`); //...invoke throwError with an error code of 422 and a message that says the section does not exist
   }
 };
 
-app.use(express.json());
+app.use(express.json()); //ensure that the app parses the request body to json by default
 
-app.set('port', process.env.PORT || 3000);
-app.locals.title = 'Kickstarter Campaigns';
+app.set('port', process.env.PORT || 3000); //listen to whatever is in the environment variable PORT (i.e. if coming from Heroku) or default to 3000
 
-app.get('/', (request, response) => {
-  response.send('Welcome to the Kickstarter database!');
+app.locals.title = 'Kickstarter Campaigns'; //in the app.locals object, create a key:value pair of title: 'Kickstarter Campaigns'
+
+app.get('/', (request, response) => { //if a GET request comes from '/'...
+  response.send('Welcome to the Kickstarter database!'); //return a string with a welcome message
 });
 
 app.get('/api/v1/:section', async (request, response) => {
