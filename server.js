@@ -101,6 +101,15 @@ app.post('/api/v1/campaigns', async (request, response) => {
     .catch(error = console.log(error))
 });
 
+app.delete('/api/v1/campaigns', (request, response) => {
+  const { id } = request.body;
+  database('campaigns')
+    .where('id', parseInt(id))
+    .del()
+    .then(response.status(201).json(id))
+    .catch(error => console.log(error))
+})
+
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on http://localhost:${app.get('port')}.`);
 });
