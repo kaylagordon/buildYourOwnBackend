@@ -115,22 +115,16 @@ app.delete('/api/v1/:section', async (request, response) => {
     .catch(throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`));
 });
 
-app.get('*', (req, res) => {
-  res
-    .status(404)
-    .send('404: Not found');
+app.get('*', (request, response) => {
+  throwError(response, 404, '404: Not found');
 });
 
-app.post('*', (req, res) => {
-  res
-    .status(404)
-    .send('404: Not found');
+app.post('*', (request, response) => {
+  throwError(response, 404, '404: Not found');
 });
 
-app.delete('*', (req, res) => {
-  res
-    .status(404)
-    .send('404: Not found');
+app.delete('*', (request, response) => {
+  throwError(response, 404, '404: Not found');
 });
 
 app.listen(app.get('port'), () => {
