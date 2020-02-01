@@ -83,13 +83,19 @@ app.post('/api/v1/campaigns', async (request, response) => {
   const { name, creator, category_name, location } = newCampaign;
   const categories = await database('categories').select();
 
-  const categoryId = categories.find(category => category.category === category_name).id;
+  const matchingCategory = categories.find(category => category.category === category_name);
+
+  if (!matchingCategory) {
+    return response
+      .status(422)
+      .send({ error: `The category of ${category_name} does not exist. You can only create campaigns in existing categories.` });
+  }
 
   database('campaigns').insert({
     name,
     creator,
     location,
-    category_id: categoryId
+    category_id: matchingCategory.id
   }, 'id')
     .then(response.status(201).json(newCampaign))
     .catch(error = console.log(error))
