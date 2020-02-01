@@ -1,6 +1,6 @@
 # Build Your Own Backend
 ### Background
-This is the first server and database I've built! I used **Express** as a framework on top of **Node.js** to handle the routes. I used **Knex** to make SQL queries. I built the database using **PostgreSQL**. The database hold data on Kickstarter campaigns.
+This is the first server and database I've built! I used **Express** as a framework on top of **Node.js** to handle the routes. I used **Knex** to make SQL queries. I built the database using **PostgreSQL**. The database contains data on Kickstarter campaigns.
 
 If you would like to see a line-by-line explanation of the methods in the `server.js` file, open that file in the `articulation` branch of this project (or [click here](https://github.com/kaylaewood/buildYourOwnBackend/blob/articulation/server.js)).
 
