@@ -115,7 +115,13 @@ app.delete('/api/v1/campaigns', (request, response) => {
     .del()
     .then(response.status(200).json(id))
     .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
-})
+});
+
+app.delete('/api/v1/categories', (request, response) => {
+  return response
+    .status(422)
+    .send({ error: `You cannot delete a category. You can only delete an individual campaign.` });
+});
 
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on http://localhost:${app.get('port')}.`);
