@@ -4,6 +4,8 @@ This is the first server and database I've built! I used **Express** as a framew
 
 If you would like to see a line-by-line explanation of the methods in the `server.js` file, open that file in the `articulation` branch of this project (or [click here](https://github.com/kaylaewood/buildYourOwnBackend/blob/articulation/server.js)).
 
+I organized this project by creating user stories on my [GitHub projects board](https://github.com/kaylaewood/buildYourOwnBackend/projects/1).
+
 ### API Documentation
 All API endpoints are prefixed with either `http://localhost:3000` or `https://buildyourownbackend.herokuapp.com/`.
 
