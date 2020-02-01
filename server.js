@@ -84,9 +84,13 @@ app.post('/api/v1/:section', async (request, response) => {
     };
   };
 
-  database(`${section}`).insert(newItem, 'id')
-    .then(response.status(201).json(newItem))
-    .catch(throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`));
+  let newItemId = await database(`${section}`).insert(newItem, 'id')
+
+  if (!newItemId) {
+    throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`);
+  } else {
+    response.status(201).json({...newItem, id: newItemId[0]})
+  }
 });
 
 app.delete('/api/v1/:section', async (request, response) => {
