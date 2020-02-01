@@ -4,6 +4,16 @@ const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
 
+const throwError = (response, statusCode, message) => {
+  return response.status(statusCode).send({ error: message });
+}
+
+const checkSection = (response, section) => {
+  if (section !== 'categories' && section !== 'campaigns') {
+    throwError(response, 422, `The section ${section} does not exist. The only sections are categories and campaigns.`);
+  }
+};
+
 app.use(express.json());
 
 app.set('port', process.env.PORT || 3000);
@@ -13,114 +23,96 @@ app.get('/', (request, response) => {
   response.send('Welcome to the Kickstarter database!');
 });
 
-app.get('/api/v1/categories', async (request, response) => {
+app.get('/api/v1/:section', async (request, response) => {
+  const { section } = request.params;
+
+  checkSection(response, section);
+
   try {
+    const data = await database(`${section}`).select();
+    response.status(200).json(data);
+  } catch(error) {
+    throwError(response, 500, 'Internal Server Error: Something went wrong with your request. Please try again.');
+  };
+});
+
+app.get('/api/v1/:section/:id', async (request, response) => {
+  const { section, id } = request.params;
+
+  checkSection(response, section);
+
+  try {
+    const data = await database(`${section}`).select();
+    const item = data.find(item => item.id === parseInt(id));
+
+    if (!item) {
+      throwError(response, 404, `There is no item in the ${section} with an id of ${id}.`);
+    };
+
+    response.status(200).json(item);
+  } catch(error) {
+    throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`);
+  };
+});
+
+app.post('/api/v1/:section', async (request, response) => {
+  const newItem = request.body;
+  const { section } = request.params;
+  let requiredParameters;
+
+  checkSection(response, section);
+
+  if (section === 'categories') {
+    requiredParameters = ['category', 'category_link'];
+  } else {
+    requiredParameters = ['name', 'creator','category_id', 'location'];
+  };
+
+  for (var i = 0; i < requiredParameters.length; i++) {
+    if (!newItem[requiredParameters[i]]) {
+      throwError(response, 422, `Expected format: {${requiredParameters.map(param => ` ${param}: <String>`)} }. You are missing the ${requiredParameters[i]} property.`);
+    };
+  };
+
+  if (section === 'campaigns') {
+    const { category_id } = newItem;
     const categories = await database('categories').select();
-    response.status(200).json(categories);
-  } catch(error) {
-    response.status(500).json({ error });
-  }
+    const matchingCategory = categories.find(category => category.id === category_id);
+
+    if (!matchingCategory) {
+      throwError(response, 422, `A category with an id of ${category_id} does not exist. You can only create campaigns in existing categories.`);
+    };
+  };
+
+  database(`${section}`).insert(newItem, 'id')
+    .then(response.status(201).json(newItem))
+    .catch(throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`));
 });
 
-app.get('/api/v1/campaigns', async (request, response) => {
-  try {
-    const campaigns = await database('campaigns').select();
-    response.status(200).json(campaigns);
-  } catch(error) {
-    response.status(500).json({ error });
-  }
-});
-
-app.get('/api/v1/categories/:id', async (request, response) => {
-  const { id } = request.params;
-  const categories = await database('categories').select();
-  const category = categories.find(category => category.id === parseInt(id));
-  if (!category) {
-    return response.sendStatus(404);
-  }
-
-  response.status(200).json(category);
-});
-
-app.get('/api/v1/campaigns/:id', async (request, response) => {
-  const { id } = request.params;
-  const campaigns = await database('campaigns').select();
-  const campaign = campaigns.find(campaign => campaign.id === parseInt(id));
-  if (!campaign) {
-    return response.sendStatus(404);
-  }
-
-  response.status(200).json(campaign);
-});
-
-app.post('/api/v1/categories', (request, response) => {
-  const newCategory = request.body;
-
-  for (let requiredParameter of ['category', 'category_link']) {
-    if (!newCategory[requiredParameter]) {
-      return response
-        .status(422)
-        .send({ error: `Expected format: { category: <String>, category_link: <String> }. You are missing the ${requiredParameter} property.` });
-    }
-  }
-
-  database('categories').insert(newCategory, 'id')
-    .then(response.status(201).json(newCategory))
-    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
-});
-
-app.post('/api/v1/campaigns', async (request, response) => {
-  const newCampaign = request.body;
-
-  for (let requiredParameter of ['name', 'creator','category_name', 'location']) {
-    if (!newCampaign[requiredParameter]) {
-      return response
-        .status(422)
-        .send({ error: `Expected format: { name: <String>, creator: <String>, category_name: <String>, location: <String> }. You are missing the ${requiredParameter} property.` });
-    }
-  }
-
-  const { name, creator, category_name, location } = newCampaign;
-  const categories = await database('categories').select();
-
-  const matchingCategory = categories.find(category => category.category === category_name);
-
-  if (!matchingCategory) {
-    return response
-      .status(422)
-      .send({ error: `The category of ${category_name} does not exist. You can only create campaigns in existing categories.` });
-  }
-
-  database('campaigns').insert({
-    name,
-    creator,
-    location,
-    category_id: matchingCategory.id
-  }, 'id')
-    .then(response.status(201).json(newCampaign))
-    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
-});
-
-app.delete('/api/v1/campaigns', (request, response) => {
+app.delete('/api/v1/:section', async (request, response) => {
+  const { section } = request.params;
   const { id } = request.body;
 
-  if (!id) {
-    return response
-      .status(422)
-      .send({ error: `Expected format: { id: <Number> }. You are missing the id property.` });
-  }
+  checkSection(response, section);
+
+  if (section === 'categories') {
+    throwError(response, 422, `You cannot delete a category. You can only delete an individual campaign.`);
+  } else if (!id) {
+    throwError(response, 422, `Expected format: { id: <Number> }. You are missing the id property.`);
+  };
+
+  const campaigns = await database(`campaigns`).select();
+  const campaign = campaigns.find(campaign => campaign.id === parseInt(id));
+
+  if (!campaign) {
+    throwError(response, 404, `There is no campaign with an id of ${id}.`);
+  };
 
   database('campaigns')
     .where('id', parseInt(id))
     .del()
     .then(response.status(200).json(id))
-    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
-});
-
-app.delete('/api/v1/categories', (request, response) => {
-  return response
-    .status(422)
-    .send({ error: `You cannot delete a category. You can only delete an individual campaign.` });
+    .catch(throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`));
 });
 
 app.listen(app.get('port'), () => {
