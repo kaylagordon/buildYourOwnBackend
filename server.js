@@ -66,7 +66,7 @@ app.post('/api/v1/categories', (request, response) => {
 
   database('categories').insert(newCategory, 'id')
     .then(response.status(201).json(newCategory))
-    .catch(error = console.log(error))
+    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
 });
 
 app.post('/api/v1/campaigns', async (request, response) => {
@@ -98,16 +98,23 @@ app.post('/api/v1/campaigns', async (request, response) => {
     category_id: matchingCategory.id
   }, 'id')
     .then(response.status(201).json(newCampaign))
-    .catch(error = console.log(error))
+    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
 });
 
 app.delete('/api/v1/campaigns', (request, response) => {
   const { id } = request.body;
+
+  if (!id) {
+    return response
+      .status(422)
+      .send({ error: `Expected format: { id: <Number> }. You are missing the id property.` });
+  }
+
   database('campaigns')
     .where('id', parseInt(id))
     .del()
-    .then(response.status(201).json(id))
-    .catch(error => console.log(error))
+    .then(response.status(200).json(id))
+    .catch(response.status(500).send({ error: `Internal Server Error: Something went wrong with your request. Please try again.` }));
 })
 
 app.listen(app.get('port'), () => {
