@@ -116,6 +116,18 @@ app.delete('/api/v1/:section', async (request, response) => { //if a DELETE requ
     .catch(throwError(response, 500, `Internal Server Error: Something went wrong with your request. Please try again.`)); //if something goes wrong, invoke throwError to indicate something went wrong on the server side
 });
 
+app.get('*', (request, response) => { //if a GET request comes from any URL other than what has been specified so far...
+  throwError(response, 404, '404: Not found'); //invoke throwError to with a failed status code and a message to let the user know the URL they have entered does not exist
+});
+
+app.post('*', (request, response) => { //if a POST request comes from any URL other than what has been specified so far...
+  throwError(response, 404, '404: Not found'); //invoke throwError to with a failed status code and a message to let the user know the URL they have entered does not exist
+});
+
+app.delete('*', (request, response) => { //if a DELETE request comes from any URL other than what has been specified so far...
+  throwError(response, 404, '404: Not found'); //invoke throwError to with a failed status code and a message to let the user know the URL they have entered does not exist
+});
+
 app.listen(app.get('port'), () => { //listen to the port
   console.log(`${app.locals.title} is running on http://localhost:${app.get('port')}.`); //log a message that lets the user know which port "Kickstarter Campaigns" is running on
 });
