@@ -20,7 +20,7 @@ app.set('port', process.env.PORT || 3000);
 app.locals.title = 'Kickstarter Campaigns';
 
 app.get('/', (request, response) => {
-  response.send('Welcome to the Kickstarter database!');
+  response.send('Welcome to the Kickstarter database! For the documentation on this API, please go to https://github.com/kaylaewood/buildYourOwnBackend');
 });
 
 app.get('/api/v1/:section', async (request, response) => {
